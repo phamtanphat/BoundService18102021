@@ -15,7 +15,8 @@ import androidx.core.app.NotificationCompat;
 public class MyService extends Service {
 
     String CHANNEL_ID = "CHANNEL_ID";
-    int REQUEST_CODE_COUNT = 1;
+    int REQUEST_CODE_MINUS = 1;
+    int REQUEST_CODE_PLUS = 2;
     Notification mNotification;
     int mCount = 0;
     NotificationManager mNotificationManager;
@@ -38,6 +39,11 @@ public class MyService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d("BBB","onStartCommand");
+        if (intent != null){
+            mCount += intent.getIntExtra("count",0);
+            mNotification = createNotification(this,"Count : " + mCount);
+            mNotificationManager.notify(1,mNotification);
+        }
         return START_NOT_STICKY;
     }
 
@@ -51,20 +57,21 @@ public class MyService extends Service {
         Intent intentMinus = new Intent(context,MyService.class);
         intentMinus.putExtra("count",-1);
 
-        PendingIntent pendingIntentMinus = PendingIntent.getService(context,REQUEST_CODE_COUNT,intentMinus,PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pendingIntentMinus = PendingIntent.getService(context,REQUEST_CODE_MINUS,intentMinus,PendingIntent.FLAG_UPDATE_CURRENT);
 
         Intent intentPlus = new Intent(context,MyService.class);
         intentPlus.putExtra("count",1);
 
-        PendingIntent pendingIntentPlus = PendingIntent.getService(context,REQUEST_CODE_COUNT,intentPlus,PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pendingIntentPlus = PendingIntent.getService(context,REQUEST_CODE_PLUS,intentPlus,PendingIntent.FLAG_UPDATE_CURRENT);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context,CHANNEL_ID);
         builder.setContentTitle("Thông báo");
         builder.setContentText(message);
         builder.setSmallIcon(R.mipmap.ic_launcher);
         builder.setShowWhen(true);
-        builder.addAction(R.mipmap.ic_launcher,"Plus",pendingIntentPlus);
+        builder.addAction(R.mipmap.ic_launcher_round,"Plus",pendingIntentPlus);
         builder.addAction(R.mipmap.ic_launcher,"Minus",pendingIntentMinus);
+
 
         return builder.build();
     }
