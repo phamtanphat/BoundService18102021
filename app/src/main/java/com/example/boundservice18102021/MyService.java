@@ -30,6 +30,7 @@ public class MyService extends Service {
         super.onCreate();
         mNotification = createNotification(this,"Count : " + mCount);
         startForeground(1,mNotification);
+        mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         mNotificationManager.notify(1,mNotification);
         Log.d("BBB","onCreate");
     }
@@ -60,6 +61,7 @@ public class MyService extends Service {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context,CHANNEL_ID);
         builder.setContentTitle("Thông báo");
         builder.setContentText(message);
+        builder.setSmallIcon(R.mipmap.ic_launcher);
         builder.setShowWhen(true);
         builder.addAction(R.mipmap.ic_launcher,"Plus",pendingIntentPlus);
         builder.addAction(R.mipmap.ic_launcher,"Minus",pendingIntentMinus);
