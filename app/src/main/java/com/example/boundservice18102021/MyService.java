@@ -6,6 +6,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
@@ -20,6 +21,7 @@ public class MyService extends Service {
     private int REQUEST_CODE_PLUS = 2;
     private Notification mNotification;
     private int mCount = 0;
+    private OnListenerCountChange mOnListenerCountChange;
     NotificationManager mNotificationManager;
 
     class MyBinder extends Binder {
@@ -50,10 +52,25 @@ public class MyService extends Service {
         Log.d("BBB", "onStartCommand");
         if (intent != null) {
             mCount += intent.getIntExtra("count", 0);
+            if (mOnListenerCountChange != null){
+                mOnListenerCountChange.onCountChange(mCount);
+            }
             mNotification = createNotification(this, "Count : " + mCount);
             mNotificationManager.notify(1, mNotification);
         }
         return START_NOT_STICKY;
+    }
+
+    @Override
+    public boolean onUnbind(Intent intent) {
+        Log.d("BBB","onUnbind");
+        return false;
+    }
+
+    @Override
+    public void onRebind(Intent intent) {
+        Log.d("BBB","Rebind");
+        super.onRebind(intent);
     }
 
     @Override
@@ -83,7 +100,11 @@ public class MyService extends Service {
 
         return builder.build();
     }
-    public int getCount(){
-        return mCount;
+    public void setOnListenerCountChange(OnListenerCountChange onListenerCountChange){
+        this.mOnListenerCountChange = onListenerCountChange;
+    }
+
+    interface OnListenerCountChange{
+        void onCountChange(int count);
     }
 }
